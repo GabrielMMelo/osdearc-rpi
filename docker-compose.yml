@@ -1,5 +1,14 @@
 version: '3'
 services:
+    redis:
+        build:
+            context: ./
+            dockerfile: ./images/redis/Dockerfile
+        container_name: redis
+        restart: always
+        ports:
+            - "6379:6379"
+
     minio:
         build:
             context: ./
@@ -15,8 +24,11 @@ services:
             - MINIO_ROOT_USER=${MINIO_ROOT_USER}
             - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
         command: minio server --address :9000 --console-address :9001 data/
+
     postgres:
-        image: "postgres"
+        build:
+            context: ./
+            dockerfile: ./images/postgres/Dockerfile
         restart: "always"
         container_name: "postgres"
         ports:
@@ -33,6 +45,7 @@ services:
             context: ./
             dockerfile: ./images/airflow-master/Dockerfile
         depends_on:
+            - "redis"
             - "postgres"
         container_name: airflow-scheduler
         restart: always
@@ -55,6 +68,7 @@ services:
             context: ./
             dockerfile: ./images/airflow-master/Dockerfile
         depends_on:
+            - "redis"
             - "postgres"
         container_name: airflow-webserver
         restart: always
