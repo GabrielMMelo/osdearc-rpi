@@ -1,0 +1,36 @@
+version: '3'
+services:
+    postgres:
+        image: "postgres"
+        restart: "always"
+        container_name: "postgres"
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_PASSWORD=${POSTGRES_AIRFLOW_PASS}
+            - POSTGRES_USER=${POSTGRES_AIRFLOW_USER}
+            - POSTGRES_DB=${POSTGRES_AIRFLOW_DB}
+        volumes:
+            - ./postgres_data:/var/lib/postgresql/data
+
+    airflow-init:
+        build:
+            context: ./
+            dockerfile: ./images/airflow-master/Dockerfile
+        depends_on:
+            - "postgres"
+        container_name: airflow-init
+        extra_hosts:
+            host.docker.internal: host-gateway
+        volumes:
+            - ./dags:/opt/airflow/dags
+            - ./logs:/opt/airflow/logs
+            - ./plugins:/usr/local/airflow/plugins
+        #            - ./certs:/opt/airflow/certs
+            - ./airflow.cfg:/opt/airflow/airflow.cfg
+        environment:
+            - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_AIRFLOW_USER}:${POSTGRES_AIRFLOW_PASS}@${POSTGRES_AIRFLOW_HOST}:${POSTGRES_AIRFLOW_PORT}/${POSTGRES_AIRFLOW_DB}
+            - AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://${POSTGRES_AIRFLOW_RESULTS_USER}:${POSTGRES_AIRFLOW_RESULTS_PASS}@${POSTGRES_AIRFLOW_RESULTS_HOST}:${POSTGRES_AIRFLOW_RESULTS_PORT}/${POSTGRES_AIRFLOW_RESULTS_DB}
+            - AIRFLOW__CELERY__BROKER_URL=redis://${REDIS_HOST}:${REDIS_PORT}/0
+        command: >
+           sh -c "airflow db init && airflow users create -e ${AIRFLOW_ADMIN_EMAIL} -f ${AIRFLOW_ADMIN_FIRSTNAME} -l ${AIRFLOW_ADMIN_LASTNAME} -u ${AIRFLOW_ADMIN_USERNAME} --p ${AIRFLOW_ADMIN_PASSWORD} -r Admin"
