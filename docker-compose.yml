@@ -50,17 +50,19 @@ services:
         container_name: airflow-scheduler
         restart: always
         extra_hosts:
-            host.docker.internal: host-gateway
+            - "host.docker.internal:host-gateway"
+            - "airflow-celery-worker-1:${AIRFLOW_CELERY_WORKER_1_IP}"
         volumes:
             - ./dags:/opt/airflow/dags
             - ./logs:/opt/airflow/logs
             - ./plugins:/usr/local/airflow/plugins
-        #            - ./certs:/opt/airflow/certs
             - ./airflow.cfg:/opt/airflow/airflow.cfg
         environment:
             - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_AIRFLOW_USER}:${POSTGRES_AIRFLOW_PASS}@${POSTGRES_AIRFLOW_HOST}:${POSTGRES_AIRFLOW_PORT}/${POSTGRES_AIRFLOW_DB}
             - AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://${POSTGRES_AIRFLOW_RESULTS_USER}:${POSTGRES_AIRFLOW_RESULTS_PASS}@${POSTGRES_AIRFLOW_RESULTS_HOST}:${POSTGRES_AIRFLOW_RESULTS_PORT}/${POSTGRES_AIRFLOW_RESULTS_DB}
             - AIRFLOW__CELERY__BROKER_URL=redis://${REDIS_HOST}:${REDIS_PORT}/0
+            - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW_FERNET_KEY}
+            - AIRFLOW__WEBSERVER__SECRET_KEY=${AIRFLOW_WEBSERVER_SECRET_KEY}
         command: airflow scheduler
         
     airflow-webserver:
@@ -73,12 +75,12 @@ services:
         container_name: airflow-webserver
         restart: always
         extra_hosts:
-            host.docker.internal: host-gateway
+            - "host.docker.internal:host-gateway"
+            - "airflow-celery-worker-1:${AIRFLOW_CELERY_WORKER_1_IP}"
         volumes:
             - ./dags:/opt/airflow/dags
             - ./logs:/opt/airflow/logs
             - ./plugins:/usr/local/airflow/plugins
-        #            - ./certs:/opt/airflow/certs
             - ./airflow.cfg:/opt/airflow/airflow.cfg
         ports:
             - "8000:8000"
@@ -86,4 +88,6 @@ services:
             - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_AIRFLOW_USER}:${POSTGRES_AIRFLOW_PASS}@${POSTGRES_AIRFLOW_HOST}:${POSTGRES_AIRFLOW_PORT}/${POSTGRES_AIRFLOW_DB}
             - AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://${POSTGRES_AIRFLOW_RESULTS_USER}:${POSTGRES_AIRFLOW_RESULTS_PASS}@${POSTGRES_AIRFLOW_RESULTS_HOST}:${POSTGRES_AIRFLOW_RESULTS_PORT}/${POSTGRES_AIRFLOW_RESULTS_DB}
             - AIRFLOW__CELERY__BROKER_URL=redis://${REDIS_HOST}:${REDIS_PORT}/0
+            - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW_FERNET_KEY}
+            - AIRFLOW__WEBSERVER__SECRET_KEY=${AIRFLOW_WEBSERVER_SECRET_KEY}
         command: airflow webserver --port 8000

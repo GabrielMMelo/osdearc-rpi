@@ -1,0 +1,32 @@
+{
+  "minio": {
+    "conn_type": "airbyte",
+    "description": "",
+    "host": "",
+    "login": "",
+    "password": "",
+    "schema": "",
+    "port": 9000,
+    "extra": ""
+  },
+  "spark_standalone": {
+    "conn_type": "spark",
+    "description": "",
+    "host": "spark://host.docker.internal",
+    "login": "",
+    "password": "",
+    "schema": "",
+    "port": 7077,
+    "extra": ""
+  },
+  "mongodb": {
+    "conn_type": "mongo",
+    "description": "",
+    "host": "host.docker.internal",
+    "login": "",
+    "password": "",
+    "schema": "",
+    "port": 27017,
+    "extra": ""
+  }
+}
