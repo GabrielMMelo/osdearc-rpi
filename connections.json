@@ -2,9 +2,9 @@
   "minio": {
     "conn_type": "airbyte",
     "description": "",
-    "host": "",
-    "login": "",
-    "password": "",
+    "host": "rpi.home.net",
+    "login": "admin",
+    "password": "q8Lyl30TwfiOsr7qzeim",
     "schema": "",
     "port": 9000,
     "extra": ""
@@ -23,8 +23,8 @@
     "conn_type": "mongo",
     "description": "",
     "host": "host.docker.internal",
-    "login": "",
-    "password": "",
+    "login": "root",
+    "password": "root123",
     "schema": "",
     "port": 27017,
     "extra": ""
@@ -33,8 +33,8 @@
     "conn_type": "airbyte",
     "description": "",
     "host": "host.docker.internal",
-    "login": "",
-    "password": "",
+    "login": "admin",
+    "password": "xex6cna7acz_VBW0jwc",
     "schema": "",
     "port": 7999,
     "extra": ""
